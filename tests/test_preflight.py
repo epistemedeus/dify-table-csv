@@ -579,8 +579,18 @@ os.execv(real, [real, *sys.argv[1:]])
         foreign = run(["create", "--pull", "never", "--network", "none", "--name", "foreign-sentinel", foreign_image, "true"])
         self.assertEqual(foreign.returncode, 0, foreign.stderr)
         foreign_id = foreign.stdout.decode().strip()
-        self.addCleanup(lambda: run(["rm", foreign_id]))
-        self.addCleanup(lambda: run(["image", "rm", foreign_image]))
+
+        def remove_foreign_fixture():
+            # addCleanup is LIFO. Removing the image while this container
+            # still holds it returns nonzero and leaves the image behind.
+            removed = run(["rm", foreign_id])
+            self.assertEqual(removed.returncode, 0, removed.stderr)
+            image_removed = run(["image", "rm", foreign_image])
+            self.assertEqual(image_removed.returncode, 0, image_removed.stderr)
+            self.assertEqual(ids("ps"), [])
+            self.assertEqual(ids("images"), [])
+
+        self.addCleanup(remove_foreign_fixture)
 
         missing = run([
             "create", "--pull", "never", "--network", "none",

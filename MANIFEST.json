@@ -265,8 +265,8 @@
     },
     {
       "path": "tests/test_preflight.py",
-      "bytes": 28197,
-      "sha256": "735a42bdce2c9e49ec2f636f8643257952083d441351b267039f451988989a85"
+      "bytes": 28657,
+      "sha256": "c1245966141706ce86c0c1675069c7acf8e904c423eadcc060a8a410ac56efb8"
     },
     {
       "path": "workflow/reader-table-csv.dsl.yml",
