@@ -1,4 +1,4 @@
-Public document table CSV 0.1.1
+Public document table CSV 0.1.2
 
 Verify the archive sha256 in the machine entry before you extract it.
 The archive runs without the neomorphic-io source tree.
@@ -11,7 +11,7 @@ provenance are on stderr. Exit 0 is ok. Exit 2 is usage. Exit 3 is
 unsupported. Exit 4 is malformed or another failed read. Exit 5 is transport.
 A stopped reader returns no CSV.
 
-  tar -xzf dify-table-csv-0.1.1.tar.gz
+  tar -xzf dify-table-csv-0.1.2.tar.gz
   cd dify-table-csv
   npm ci --ignore-scripts --prefix reader
   python3 src/direct_csv.py --url URL --fields Name,Value --start-reader
@@ -84,7 +84,13 @@ The compose project name is difytablecsv- followed by eight hex characters.
 Set DIFY_TABLE_PROJECT only to a name of that form. The script refuses that
 name when it already has containers or networks, and it refuses when
 127.0.0.1:5001 or 127.0.0.1:8765 is already accepting connections. Those
-checks happen before an image pull.
+checks happen before an image pull. The next check receives Python, a
+python3-venv for this interpreter, docker compose on the selected docker
+CLI, and whether that daemon can bind-mount a file in the new state
+directory. A missing prerequisite or a daemon that cannot see this
+machine's files stops the script before the upstream fetch and before any
+image pull. The script does not switch engines and does not change host
+firewall rules.
 
 Set DIFY_TABLE_STATE only to a path that does not exist yet. An existing
 directory or symlink is refused before any permission change, write, or

@@ -229,7 +229,6 @@ def _handoff(status, document_url, detail, csv_text, provenance):
             lines.append("The failure was transport. One explicit new read is appropriate. Do not treat a completed refusal as a transport retry.")
         else:
             lines.append("A completed refusal is not retried automatically. The reader contract allows only an explicit new read.")
-    lines.append("This handoff is local experiment output. It is not partner acceptance, a customer delivery, or revenue.")
     return "\n".join(lines).rstrip() + "\n"
 
 

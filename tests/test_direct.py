@@ -92,7 +92,11 @@ class TestChecker(unittest.TestCase):
         self.assertFalse(provenance["reader_truncated"])
         self.assertEqual(provenance["reader_merchant_commit"], table_csv.READER_MERCHANT_COMMIT)
         self.assertIn("CSV data rows: 2.", result["handoff"])
-        self.assertIn("local experiment output", result["handoff"])
+        self.assertIn("Document: https://example.com/doc", result["handoff"])
+        self.assertNotIn(
+            "This handoff is local experiment output. It is not partner acceptance, a customer delivery, or revenue.",
+            result["handoff"],
+        )
 
     def test_truncated_selection_does_not_claim_full_document(self):
         markdown = "<table><tr><th>Engine</th><th>Transpile</th><th>Reconcile</th></tr><tr><td>Alpha</td><td></td><td>Yes</td></tr></table>"
@@ -180,6 +184,14 @@ class TestDsl(unittest.TestCase):
     def test_workflow_contract(self):
         document = build_document()
         raw = (ROOT / "workflow" / "reader-table-csv.dsl.yml").read_text()
+        self.assertNotIn(
+            "This handoff is local experiment output. It is not partner acceptance, a customer delivery, or revenue.",
+            raw,
+        )
+        self.assertEqual(raw.count("def _handoff"), 2)
+        self.assertEqual(raw.count("not a full-document extract"), 2)
+        self.assertIn("no page cursor", raw)
+        self.assertEqual(raw.count("does not guess a rectangular grid"), 2)
         loaded = yaml.safe_load(raw)
         again = yaml.safe_load(yaml.safe_dump(loaded, sort_keys=False, allow_unicode=True, width=4096))
         self.assertEqual(again, loaded)
@@ -263,6 +275,11 @@ class TestAdmission(unittest.TestCase):
         self.assertIn("refuse: state directory already exists", script)
         self.assertIn("export-tracked-docker.sh", script)
         self.assertNotIn("nat-unprotected", script)
+        self.assertNotIn("iptables", script)
+        self.assertNotIn("br-*", script)
+        self.assertIn('python3 "$ROOT/install/preflight.py"', script)
+        self.assertLess(script.index("refuse: docker daemon is not reachable"), script.index('python3 "$ROOT/install/preflight.py"'))
+        self.assertLess(script.index('python3 "$ROOT/install/preflight.py"'), script.index("docker_pull_begin"))
         self.assertNotIn('cp -a "${src}/docker"', script)
         self.assertNotIn("rm -rf", script)
         self.assertNotIn("sysctl -w", script)
@@ -538,7 +555,7 @@ class TestBoundary(unittest.TestCase):
                 "input_bounds": "Empty fields, 33 fields, limits 0 and 40001, and a 100 character clip are unsupported.",
                 "malformed": "A non-JSON 200 is malformed. A non-JSON POST to the boundary is HTTP 400 and is not a read.",
                 "network_interruption": "Closed port and DNS are transport. The test makes one explicit second DNS read and no hidden third read.",
-                "recipient_usability": "CSV roundtrips through csv.reader. The handoff names the document, the truncation, and the local-experiment boundary.",
+                "recipient_usability": "CSV roundtrips through csv.reader. The handoff names the document, the truncation, and the next read.",
             },
             "w3c_tables_dropped_by_pinned_reader": getattr(self.__class__, "w3c_dropped_tables", None),
         }
@@ -706,13 +723,13 @@ class TestOwnedRuntime(unittest.TestCase):
             self.assertIn("refuse: state directory already exists", completed.stdout)
             self.assertNotIn("docker_pull_begin", completed.stdout)
             self.assertEqual(stat.S_IMODE(os.lstat(state).st_mode), mode)
-            self.assertEqual(open(marker, encoding="utf-8").read(), "UNCHANGED_STATE_MARKER\n")
+            self.assertEqual(Path(marker).read_text(encoding="utf-8"), "UNCHANGED_STATE_MARKER\n")
             link = os.path.join(parent, "link")
             os.symlink(state, link)
             linked = self._run_install({"DIFY_TABLE_ADMIT": "1", "DIFY_TABLE_STATE": link})
             self.assertEqual(linked.returncode, 2, linked.stdout + linked.stderr)
             self.assertIn("refuse: state directory already exists", linked.stdout)
-            self.assertEqual(open(marker, encoding="utf-8").read(), "UNCHANGED_STATE_MARKER\n")
+            self.assertEqual(Path(marker).read_text(encoding="utf-8"), "UNCHANGED_STATE_MARKER\n")
         finally:
             shutil.rmtree(parent)
 
@@ -748,7 +765,7 @@ class TestOwnedRuntime(unittest.TestCase):
             handle.write("UNCHANGED_STATE_MARKER\n")
 
     def _starttime(self, pid):
-        raw = open("/proc/%s/stat" % pid, encoding="utf-8").read()
+        raw = Path("/proc/%s/stat" % pid).read_text(encoding="utf-8")
         return raw[raw.rfind(")") + 2 :].split()[19]
 
     def test_stop_refuses_foreign_directory_and_reused_pid(self):
@@ -767,7 +784,7 @@ class TestOwnedRuntime(unittest.TestCase):
             )
             self.assertEqual(missing.returncode, 2, missing.stdout + missing.stderr)
             self.assertIn("refuse: owned runtime state is missing", missing.stdout)
-            self.assertEqual(open(os.path.join(foreign, "marker"), encoding="utf-8").read(), "UNCHANGED_STATE_MARKER\n")
+            self.assertEqual(Path(foreign, "marker").read_text(encoding="utf-8"), "UNCHANGED_STATE_MARKER\n")
             binary = os.path.join(parent, "reader_boundary.mjs")
             shutil.copy(shutil.which("sleep"), binary)
             os.chmod(binary, 0o755)
@@ -784,7 +801,7 @@ class TestOwnedRuntime(unittest.TestCase):
             self.assertEqual(reused.returncode, 0, reused.stdout + reused.stderr)
             self.assertIn("reader_pid_reused=1", reused.stdout)
             self.assertIsNone(sentinel.poll())
-            self.assertEqual(open(os.path.join(state, "marker"), encoding="utf-8").read(), "UNCHANGED_STATE_MARKER\n")
+            self.assertEqual(Path(state, "marker").read_text(encoding="utf-8"), "UNCHANGED_STATE_MARKER\n")
             moved = os.path.join(parent, "moved")
             os.mkdir(moved)
             shutil.copy(os.path.join(state, "owner.json"), os.path.join(moved, "owner.json"))
@@ -800,7 +817,7 @@ class TestOwnedRuntime(unittest.TestCase):
             self.assertEqual(changed.returncode, 2, changed.stdout + changed.stderr)
             self.assertIn("refuse: state directory identity changed", changed.stdout)
             self.assertIsNone(sentinel.poll())
-            self.assertEqual(open(os.path.join(moved, "marker"), encoding="utf-8").read(), "UNCHANGED_STATE_MARKER\n")
+            self.assertEqual(Path(moved, "marker").read_text(encoding="utf-8"), "UNCHANGED_STATE_MARKER\n")
         finally:
             if sentinel is not None and sentinel.poll() is None:
                 sentinel.kill()
@@ -828,7 +845,7 @@ class TestOwnedRuntime(unittest.TestCase):
             self.assertIn("reader_stopped=1", completed.stdout)
             self.assertIn("stack_stopped=1", completed.stdout)
             proc.wait(timeout=5)
-            self.assertEqual(open(os.path.join(state, "marker"), encoding="utf-8").read(), "UNCHANGED_STATE_MARKER\n")
+            self.assertEqual(Path(state, "marker").read_text(encoding="utf-8"), "UNCHANGED_STATE_MARKER\n")
         finally:
             if proc is not None and proc.poll() is None:
                 proc.kill()
@@ -871,9 +888,9 @@ class TestOwnedRuntime(unittest.TestCase):
             self.assertTrue(os.path.isfile(os.path.join(dest, "docker", "docker-compose.yaml")))
             self.assertFalse(os.path.exists(os.path.join(dest, "docker", "volumes", "db", "data", "LIVE_SENTINEL")))
             self.assertFalse(os.path.lexists(os.path.join(dest, "docker", "volumes", "app", "storage")))
-            self.assertEqual(open(sentinel, encoding="utf-8").read(), "LIVE_SENTINEL\n")
+            self.assertEqual(Path(sentinel).read_text(encoding="utf-8"), "LIVE_SENTINEL\n")
             self.assertEqual(os.readlink(link), outside)
-            self.assertEqual(open(secret, encoding="utf-8").read(), "OUTSIDE_SECRET_BYTES\n")
+            self.assertEqual(Path(secret).read_text(encoding="utf-8"), "OUTSIDE_SECRET_BYTES\n")
             linked = os.path.join(parent, "linked")
             os.makedirs(os.path.join(linked, "docker"))
             with open(os.path.join(linked, "docker", "docker-compose.yaml"), "w", encoding="utf-8") as handle:
@@ -894,7 +911,7 @@ class TestOwnedRuntime(unittest.TestCase):
             self.assertEqual(refused.returncode, 2, refused.stdout + refused.stderr)
             self.assertIn("refuse: tracked tree contains a symlink", refused.stdout + refused.stderr)
             self.assertFalse(os.path.exists(os.path.join(parent, "refused")))
-            self.assertEqual(open(secret, encoding="utf-8").read(), "OUTSIDE_SECRET_BYTES\n")
+            self.assertEqual(Path(secret).read_text(encoding="utf-8"), "OUTSIDE_SECRET_BYTES\n")
         finally:
             shutil.rmtree(parent)
 

@@ -155,6 +155,13 @@ if port_open 8765; then
   exit 2
 fi
 
+if ! python3 "$ROOT/install/preflight.py" "$state" "${DOCKER[@]}"; then
+  echo "not_installed"
+  echo "This script does not docker pull and does not start compose."
+  exit 2
+fi
+echo "preflight_ok=1"
+
 src="${DIFY_SOURCE:-${H64314_DIFY_SRC:-}}"
 if [[ -z "$src" ]]; then
   src="${state}/upstream"
