@@ -87,9 +87,12 @@ name when it already has containers or networks, and it refuses when
 checks happen before an image pull. The next check receives Python, a
 python3-venv for this interpreter, docker compose on the selected docker
 CLI, and whether that daemon can bind-mount a file in the new state
-directory. A missing prerequisite or a daemon that cannot see this
-machine's files stops the script before the upstream fetch and before any
-image pull. The script does not switch engines and does not change host
+directory. The mount check imports a local empty image with an inert
+command and creates a container it does not start. It removes only the
+container and image ids that create and import returned. A missing
+prerequisite, a timed-out selected command, or a daemon that cannot see
+this machine's files stops the script before the upstream fetch and before
+any image pull. The script does not switch engines and does not change host
 firewall rules.
 
 Set DIFY_TABLE_STATE only to a path that does not exist yet. An existing

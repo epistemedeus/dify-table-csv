@@ -5,8 +5,8 @@
   "members": [
     {
       "path": "COLD-INSTALL.txt",
-      "bytes": 6316,
-      "sha256": "bf528ffee7581dd9ea5e84a66c6714a53c730f54894c7d8fb38f4c6743ee5a72"
+      "bytes": 6533,
+      "sha256": "e0b06cbe6ca1f858bebef86aec1c2b7d9544b88933b2a3141251326c8eda3f1f"
     },
     {
       "path": "COMPATIBILITY.json",
@@ -60,8 +60,8 @@
     },
     {
       "path": "install/preflight.py",
-      "bytes": 5934,
-      "sha256": "ff161ab5c25c730666bf396b94e28aa7682c4821f29fe6ead0eee3146324d6cc"
+      "bytes": 13952,
+      "sha256": "a9da3f974256b711fffa8cd614b9299c1e5ca749f0680a1fcd02c10bdfa38566"
     },
     {
       "path": "install/probe-tcp.py",
@@ -265,8 +265,8 @@
     },
     {
       "path": "tests/test_preflight.py",
-      "bytes": 11267,
-      "sha256": "05c5aecdc79f70ba4b64ba450ea5927afe88bbd025986c250f3530d6b7191240"
+      "bytes": 28197,
+      "sha256": "735a42bdce2c9e49ec2f636f8643257952083d441351b267039f451988989a85"
     },
     {
       "path": "workflow/reader-table-csv.dsl.yml",
