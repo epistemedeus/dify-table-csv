@@ -1,6 +1,6 @@
 {
   "schema": "dify-table-csv.compatibility.v1",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dify": {
     "commit": "50abea97062110044f15d0e03ccecadd9ccc87ca",
     "release": "1.18.0",

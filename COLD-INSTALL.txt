@@ -1,4 +1,4 @@
-Public document table CSV 0.1.0
+Public document table CSV 0.1.1
 
 Verify the archive sha256 in the machine entry before you extract it.
 The archive runs without the neomorphic-io source tree.
@@ -11,7 +11,7 @@ provenance are on stderr. Exit 0 is ok. Exit 2 is usage. Exit 3 is
 unsupported. Exit 4 is malformed or another failed read. Exit 5 is transport.
 A stopped reader returns no CSV.
 
-  tar -xzf dify-table-csv-0.1.0.tar.gz
+  tar -xzf dify-table-csv-0.1.1.tar.gz
   cd dify-table-csv
   npm ci --ignore-scripts --prefix reader
   python3 src/direct_csv.py --url URL --fields Name,Value --start-reader

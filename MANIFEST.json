@@ -1,17 +1,17 @@
 {
   "schema": "dify-table-csv.archive-manifest.v1",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "members": [
     {
       "path": "COLD-INSTALL.txt",
       "bytes": 5912,
-      "sha256": "d48e4968160b4bba736b8df4171f76c7a95bae0a0a3dea89779fca3ccf4a4520"
+      "sha256": "45668101797b3945673e9d2aa71f4b3c82e61e134607de4de823a947008fe267"
     },
     {
       "path": "COMPATIBILITY.json",
       "bytes": 1336,
-      "sha256": "56bd41482a840a72ac075782899585a5bc1ef08c41310b079f5ade463fa88411"
+      "sha256": "f3ade7e368fe411e449857ed688d6be25044da9d8295d52031eb24dd92aa71d2"
     },
     {
       "path": "LICENSE",
@@ -35,8 +35,8 @@
     },
     {
       "path": "install/cold-install.sh",
-      "bytes": 21154,
-      "sha256": "86bd580527864a1526d2a884ef1b3cc7e982b828046c46829af19d422ce9510b"
+      "bytes": 22236,
+      "sha256": "5a5ca001b13ec12af2d650a2601243d986b6d0ff04ac9603553dff28d2089a5c"
     },
     {
       "path": "install/compose.pin.yml",
@@ -62,6 +62,11 @@
       "path": "install/probe-tcp.py",
       "bytes": 911,
       "sha256": "a0f9669087176788a7d45e13af57b31c6664d96c5dd55deab723678661b3b663"
+    },
+    {
+      "path": "install/state-boundary.py",
+      "bytes": 1305,
+      "sha256": "5349f8d31b681fd11de13b9130c36452c2ab4379470aa5f85a7ea35c847088ab"
     },
     {
       "path": "install/stop-owned-runtime.sh",
@@ -219,6 +224,16 @@
       "sha256": "230d2d67f2a6b0a3f8ef5b9c4725330c4eb496d27109c317e2b09eba12521da8"
     },
     {
+      "path": "tests/fixtures/ORIGINAL-INSTALLER-NOTICE.txt",
+      "bytes": 648,
+      "sha256": "d7c59f6bef65f7d2dbb77ed7429909ecc05fb1d219abba6f33ebfdc35369ef29"
+    },
+    {
+      "path": "tests/fixtures/original-cold-install-0.1.0.sh",
+      "bytes": 21154,
+      "sha256": "86bd580527864a1526d2a884ef1b3cc7e982b828046c46829af19d422ce9510b"
+    },
+    {
       "path": "tests/test_direct.py",
       "bytes": 45034,
       "sha256": "43743de6c85dd3bacc9d4e23925e7ef0de26553313c21a7a5d1ff37d20cbcaff"
@@ -232,6 +247,11 @@
       "path": "tests/test_installer_safety.py",
       "bytes": 5228,
       "sha256": "93a8db77ebf4e7e286953ea0caee01933a0e8898d9aaa16c3c0114927a362e82"
+    },
+    {
+      "path": "tests/test_installer_state_boundary.py",
+      "bytes": 31402,
+      "sha256": "40c7b207b797f65d679980e87d8f138f1067aa7199964b774269e0aafd97b75f"
     },
     {
       "path": "tests/test_owned_runtime_cleanup.py",

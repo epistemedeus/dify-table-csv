@@ -1,0 +1,12 @@
+Original installer control for the state-boundary regression.
+
+The sibling file original-cold-install-0.1.0.sh is the unmodified
+examples/dify-table-csv/install/cold-install.sh from product base
+377fe1635c3fc0e527dbb04591776be825e9bcff.
+SHA-256 86bd580527864a1526d2a884ef1b3cc7e982b828046c46829af19d422ce9510b.
+Size 21154 bytes.
+Those bytes are the MIT-licensed sample installer. The regression reads this
+fixture, so the public package does not need another Git history. With
+admission and a new state directory inside its package root, this installer
+creates that directory and invokes docker. The corrected installer is
+install/cold-install.sh.

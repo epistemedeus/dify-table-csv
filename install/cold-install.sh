@@ -3,7 +3,8 @@
 # Without DIFY_TABLE_ADMIT=1 or H64314_ADMIT_DIFY=1 it does not docker pull
 # and does not start containers. A supplied Dify checkout is read only.
 # Normal CSV commands are src/direct_csv.py and install/use-existing.py.
-# State is an exclusively created directory. Cleanup is install/stop-owned-runtime.sh.
+# State is an exclusively created directory outside this package source.
+# Cleanup is install/stop-owned-runtime.sh.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -42,8 +43,32 @@ else
   PROJECT="difytablecsv-${hex}"
 fi
 
+# Canonical source and candidate, including existing symlink ancestors.
+# Exit 3 means the state root is the package source or a path inside it.
+state_is_inside_source() {
+  local candidate="$1"
+  local rc=0
+  python3 "$ROOT/install/state-boundary.py" "$ROOT" "$candidate" "$(pwd -P)" >/dev/null || rc=$?
+  if [[ "$rc" == "3" ]]; then
+    return 0
+  fi
+  if [[ "$rc" == "0" ]]; then
+    return 1
+  fi
+  echo "not_installed"
+  echo "refuse: state directory is not a usable path"
+  echo "This script does not docker pull and does not start compose."
+  exit 2
+}
+
 if [[ -n "${DIFY_TABLE_STATE:-}" ]]; then
   state="$DIFY_TABLE_STATE"
+  if state_is_inside_source "$state"; then
+    echo "not_installed"
+    echo "refuse: state directory is inside the package source"
+    echo "This script does not docker pull and does not start compose."
+    exit 2
+  fi
   if [[ -L "$state" || -e "$state" ]]; then
     echo "not_installed"
     echo "refuse: state directory already exists"
@@ -64,6 +89,13 @@ if [[ -n "${DIFY_TABLE_STATE:-}" ]]; then
     exit 2
   fi
 else
+  probe="$(mktemp -u /tmp/dify-table-state-XXXXXX)"
+  if state_is_inside_source "$probe"; then
+    echo "not_installed"
+    echo "refuse: state directory is inside the package source"
+    echo "This script does not docker pull and does not start compose."
+    exit 2
+  fi
   state="$(mktemp -d /tmp/dify-table-state-XXXXXX)"
 fi
 chmod 700 "$state"
