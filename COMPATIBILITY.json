@@ -1,0 +1,32 @@
+{
+  "schema": "dify-table-csv.compatibility.v1",
+  "version": "0.1.0",
+  "dify": {
+    "commit": "50abea97062110044f15d0e03ccecadd9ccc87ca",
+    "release": "1.18.0",
+    "dsl_version": "0.7.0",
+    "license_sha256": "232cf91474932d5110ed304e53b6b742a58463857c571fae803fdf2ac36d7bb3",
+    "export": "GET /console/api/apps/<uuid>/export?include_secret=false&format=yaml",
+    "import": "POST /console/api/apps/imports",
+    "publish": "POST /console/api/apps/<uuid>/workflows/publish",
+    "run": "POST /v1/workflows/run",
+    "source": "https://github.com/langgenius/dify"
+  },
+  "reader": {
+    "core_commit": "38f8787b04bf3221ee0875ce1a6af687592c8015",
+    "merchant_commit": "a1dc09bb076b823fb3492ea79fa10f8602ed01a5",
+    "extract_sha256": "e087cdcc6bbb019fa9ea0b8ca2e5f7d9e682dfb2bfd6b205e119330d32a5c6e1",
+    "package_lock_sha256": "fff2da9d1138eb6d6aab7718b797dee9e342366f69779ab9f7cd788421a35698",
+    "entrypoint": "readMarkdown",
+    "repository": "https://github.com/epistemedeus/x402-url-extractor"
+  },
+  "workflow_reader_url": "http://host.docker.internal:8765/v1/read",
+  "model_node": false,
+  "total_tokens": 0,
+  "http_503": "malformed",
+  "http_503_retryable": false,
+  "http_503_csv": "",
+  "weaviate_digest": null,
+  "admission_flag": "DIFY_TABLE_ADMIT=1",
+  "admission_flag_compatibility": "H64314_ADMIT_DIFY=1"
+}

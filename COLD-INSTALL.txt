@@ -1,0 +1,125 @@
+Public document table CSV 0.1.0
+
+Verify the archive sha256 in the machine entry before you extract it.
+The archive runs without the neomorphic-io source tree.
+
+Direct route
+
+This command does not start Dify. It starts the packed reader, reads the
+document URL you supply, and prints CSV on stdout. Status, retryable, and
+provenance are on stderr. Exit 0 is ok. Exit 2 is usage. Exit 3 is
+unsupported. Exit 4 is malformed or another failed read. Exit 5 is transport.
+A stopped reader returns no CSV.
+
+  tar -xzf dify-table-csv-0.1.0.tar.gz
+  cd dify-table-csv
+  npm ci --ignore-scripts --prefix reader
+  python3 src/direct_csv.py --url URL --fields Name,Value --start-reader
+
+Replace URL and Name,Value with the public document and the columns you want.
+Page values other than 1 are unsupported and do not call the reader.
+Pass --reader when a reader is already listening. Omit --start-reader then.
+
+The archive includes two caption-free samples. Encode a sample and run the
+same command. A second sample with different columns returns different CSV.
+
+  python3 - << 'PY'
+  import base64, pathlib, subprocess, sys
+  specs = [("samples/item-qty.html", "Item,Qty"), ("samples/item-note.html", "Item,Note")]
+  for name, fields in specs:
+      body = pathlib.Path(name).read_bytes()
+      url = "https://httpbin.org/base64/" + base64.urlsafe_b64encode(body).decode("ascii")
+      print(url)
+      completed = subprocess.run(["python3", "src/direct_csv.py", "--url", url, "--fields", fields, "--start-reader"])
+      if completed.returncode != 0:
+          sys.exit(completed.returncode)
+  PY
+
+Existing Dify 1.18 runtime
+
+Start the reader where that runtime can reach it. For Dify containers on the
+same host, bind a reachable address. The packed workflow calls
+http://host.docker.internal:8765/v1/read unless you pass another --reader-url.
+
+  READER_CORE=./reader READER_BIND=0.0.0.0 PORT=8765 DIFY_TABLE_ADMIT=1 node src/reader_boundary.mjs
+
+Wait until GET http://127.0.0.1:8765/health returns ok. Then import and run
+with your console, your admin file, and your document. The admin file has one
+email, name, password, and init_password line. This command does not stop
+the runtime and does not substitute a sample URL.
+
+  python3 install/use-existing.py \
+    --console http://127.0.0.1:5001 \
+    --admin-file /path/to/admin.txt \
+    --url URL \
+    --fields Name,Value
+
+A console that is not loopback also needs --i-own-this-runtime.
+Pass --reader-base when the checker comparison should use a reader other than
+http://127.0.0.1:8765. Run again with a different URL and fields, and with
+--app-id printed by the first run. The runtime stays up for that second run.
+runtime_left_intact=1 is printed on success and on failure. Exit 0 is a
+matching ok result with total_tokens 0. Exit 3 is unsupported. Exit 5 is
+transport. Exit 4 is another failed read. Exit 1 is an import, publish, or
+HTTP failure. Exit 2 is usage.
+
+Disposable acceptance
+
+install/cold-install.sh is the disposable acceptance tool. It is not required
+when the direct command or an existing runtime already returns the CSV.
+install/owned-runtime-probe.sh checks owned cleanup with busybox and does not
+pull Dify.
+
+  export DIFY_TABLE_ADMIT=1
+  bash install/cold-install.sh
+
+H64314_ADMIT_DIFY=1 is still accepted. The script fetches public Dify commit
+50abea97062110044f15d0e03ccecadd9ccc87ca when DIFY_SOURCE and H64314_DIFY_SRC
+are unset, checks its LICENSE sha256, and starts api, worker, postgres,
+redis, sandbox, the SSRF proxy, the plugin daemon, and the permissions init.
+It does not start Weaviate, web, nginx, or the agent services. Weaviate
+1.39.13 has no recorded digest and is not pulled.
+
+The compose project name is difytablecsv- followed by eight hex characters.
+Set DIFY_TABLE_PROJECT only to a name of that form. The script refuses that
+name when it already has containers or networks, and it refuses when
+127.0.0.1:5001 or 127.0.0.1:8765 is already accepting connections. Those
+checks happen before an image pull.
+
+Set DIFY_TABLE_STATE only to a path that does not exist yet. An existing
+directory or symlink is refused before any permission change, write, or
+Docker command. The script creates that directory itself and records the
+directory identity with the container and network ids it creates.
+
+A supplied checkout (DIFY_SOURCE, or H64314_DIFY_SRC) is read only. The
+acceptance tool exports that commit's tracked docker tree into the new state
+directory. Live database files, storage, and symlinks stay in the supplied
+checkout. Owned bridges use gateway mode nat. The filter rule for each
+owned bridge drops packets forwarded onto that bridge from any other
+interface, so an unpublished port is not a direct route. The table
+reader is a host process bound to the docker0 address. The API, worker,
+and SSRF proxy resolve host.docker.internal to that same address. Host
+sysctls stay unchanged.
+
+DIFY_TABLE_KEEP=1 leaves the recorded project and the reader up. Stop that
+project with:
+
+  bash install/stop-owned-runtime.sh STATE_DIR
+
+A reused process id, a foreign directory, or a changed state identity does
+not stop another process and does not delete its files.
+
+Stopped reader, malformed input, unsupported input, and recovery
+
+  A stopped reader returns HTTP 503. The checker records malformed, an empty
+  CSV, and retryable false. That is the installed classification. Do not treat
+  it as a transport retry and do not fill the CSV from a fixture.
+  A non-JSON reader body is malformed. Page 2 and combined spans are
+  unsupported. DNS failure is transport and is retryable only as an explicit
+  new read.
+  Recovery is another run after the reader process is listening. The workflow
+  does not retry the HTTP node by itself.
+
+Console export on 1.18.0 defaults to an ifpkg zip. The acceptance tool
+requests format=yaml and include_secret=false, reimports that YAML, and runs
+POST /v1/workflows/run. total_tokens stays 0.

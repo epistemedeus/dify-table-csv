@@ -1,0 +1,31 @@
+dify-table-csv 0.1.0
+
+One secret-free Dify workflow that reads one public document through the pinned
+free reader and returns a checked rectangular CSV, provenance, and a handoff.
+The same checker runs directly, without Dify and without a model call.
+
+Licence
+  Files written for this sample are MIT. See LICENSE.
+  The pinned reader is MIT, Copyright (c) 2026 SameDayDesk. See reader/LICENSE
+  and reader/notices. Its bytes are the public extract at
+  https://github.com/epistemedeus/x402-url-extractor
+  commit 38f8787b04bf3221ee0875ce1a6af687592c8015,
+  packaged from merchant commit a1dc09bb076b823fb3492ea79fa10f8602ed01a5.
+  extract.mjs sha256 e087cdcc6bbb019fa9ea0b8ca2e5f7d9e682dfb2bfd6b205e119330d32a5c6e1.
+  Dify is not included. The engine pin is langgenius/dify
+  50abea97062110044f15d0e03ccecadd9ccc87ca (1.18.0).
+  Its license text is licenses/dify-1.18.0-LICENSE
+  sha256 232cf91474932d5110ed304e53b6b742a58463857c571fae803fdf2ac36d7bb3.
+  Modified Apache-2.0 with extra multi-tenant and frontend logo conditions.
+  This package does not start the Dify web image, so the frontend logo
+  condition is not invoked. Do not operate a multi-tenant Dify service from
+  this sample.
+
+Source
+  Repository: epistemedeus/neomorphic-io
+  Path: examples/dify-table-csv
+
+Configuration
+  Local admin passwords and Dify SECRET_KEY are generated at install time
+  into the state directory and are not part of this archive.
+  Setup, the direct command, and recovery are in COLD-INSTALL.txt.

@@ -1,0 +1,247 @@
+{
+  "schema": "dify-table-csv.archive-manifest.v1",
+  "version": "0.1.0",
+  "license": "MIT",
+  "members": [
+    {
+      "path": "COLD-INSTALL.txt",
+      "bytes": 5912,
+      "sha256": "d48e4968160b4bba736b8df4171f76c7a95bae0a0a3dea89779fca3ccf4a4520"
+    },
+    {
+      "path": "COMPATIBILITY.json",
+      "bytes": 1336,
+      "sha256": "56bd41482a840a72ac075782899585a5bc1ef08c41310b079f5ade463fa88411"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1112,
+      "sha256": "238cf73a0312a806fd20a920f17422f666873f9d24e7af500211bb6658f8ef49"
+    },
+    {
+      "path": "LICENSES.md",
+      "bytes": 1666,
+      "sha256": "32ef7b9d6cdd95f628691882805cc92ecf27c96941350b8b4ca0ede6c3755baa"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1448,
+      "sha256": "4bd72ecd76688c2eeb7e9d4d34acc2641f5da4c8fae8dd8016963d91d82cca90"
+    },
+    {
+      "path": "SOURCE-NOTICE.txt",
+      "bytes": 1489,
+      "sha256": "ae01c304764f870cb7c5226c62cfeb68b3dc56c23427f90a78c37af22dcaf5d2"
+    },
+    {
+      "path": "install/cold-install.sh",
+      "bytes": 21154,
+      "sha256": "86bd580527864a1526d2a884ef1b3cc7e982b828046c46829af19d422ce9510b"
+    },
+    {
+      "path": "install/compose.pin.yml",
+      "bytes": 3316,
+      "sha256": "ead1d456b0679d6389aeef31958f99c9db1c633b90ab8bb13ba8cc035f7f65b9"
+    },
+    {
+      "path": "install/export-tracked-docker.sh",
+      "bytes": 2776,
+      "sha256": "0e7b4aa0b7822186682e158e424ec814e36761bbe6496df64f2530c0dfcc5d9d"
+    },
+    {
+      "path": "install/installed-proof.py",
+      "bytes": 22988,
+      "sha256": "3329164d64bb29f6ccd9f726eeffee3de29e28c97c85b469c4b3dc1908cb8248"
+    },
+    {
+      "path": "install/owned-runtime-probe.sh",
+      "bytes": 18849,
+      "sha256": "986d6896bbb2829154f43e7a84e248e3e832220eaa5927bc52044f31a5dafc58"
+    },
+    {
+      "path": "install/probe-tcp.py",
+      "bytes": 911,
+      "sha256": "a0f9669087176788a7d45e13af57b31c6664d96c5dd55deab723678661b3b663"
+    },
+    {
+      "path": "install/stop-owned-runtime.sh",
+      "bytes": 9006,
+      "sha256": "4fb63e58d504887794480f7cab9320dadbbd5b564fd2d0c24ec78452479abf80"
+    },
+    {
+      "path": "install/use-existing.py",
+      "bytes": 10781,
+      "sha256": "b5336df025dc5fddd3c07b1ec51c54b106747f364de5c80250b1300798498423"
+    },
+    {
+      "path": "install/verify-compose-hosts.py",
+      "bytes": 1896,
+      "sha256": "a2a91aedae38219cec3c821a058772159a61e0640682072ff59a2bffdc25c12b"
+    },
+    {
+      "path": "licenses/dify-1.18.0-LICENSE",
+      "bytes": 1801,
+      "sha256": "232cf91474932d5110ed304e53b6b742a58463857c571fae803fdf2ac36d7bb3"
+    },
+    {
+      "path": "reader/LICENSE",
+      "bytes": 1068,
+      "sha256": "c9e2795d29bf1008cbd36ac045bd3c77d537438a51d8dda34e158f4e82a6a27c"
+    },
+    {
+      "path": "reader/SOURCES.json",
+      "bytes": 2742,
+      "sha256": "c298cdde73b475486753d30de4d79ec4207e5048307103e3e5ba8d5bf1ee1eab"
+    },
+    {
+      "path": "reader/extract-batch-c1/public-fetch.mjs",
+      "bytes": 2005,
+      "sha256": "780264c1f85a32c7dda9432d6590775553f1a8afd21d677d53d7f34c0048a082"
+    },
+    {
+      "path": "reader/extract-batch-c1/url-guard.mjs",
+      "bytes": 2340,
+      "sha256": "85931890091efa2b91399b4356764e8bb6adb7f1f81bcf61ad8e5b0e5935193d"
+    },
+    {
+      "path": "reader/extract-batch-config.mjs",
+      "bytes": 2995,
+      "sha256": "4ef4d63a5b379250620443fa19c0ba4fa2c0b2d6035b480cf9c0b224c3201728"
+    },
+    {
+      "path": "reader/extract-capture.mjs",
+      "bytes": 6384,
+      "sha256": "64c4c0422bd84cedb7168d0509b694d88ef1f8a694e7c5ecc48b18080493b0d5"
+    },
+    {
+      "path": "reader/extract-excerpt-budget.mjs",
+      "bytes": 2648,
+      "sha256": "f767283b0078823c4da27b32f4f7c8dab6cb4740e2af1feb660e641ba2376419"
+    },
+    {
+      "path": "reader/extract.mjs",
+      "bytes": 15857,
+      "sha256": "e087cdcc6bbb019fa9ea0b8ca2e5f7d9e682dfb2bfd6b205e119330d32a5c6e1"
+    },
+    {
+      "path": "reader/markdown-table.mjs",
+      "bytes": 11713,
+      "sha256": "cec20b50a4efd91688ff22c4d28c176c3f538f080111af36f4bce2b5a55846ba"
+    },
+    {
+      "path": "reader/notices/npm/@exodus/bytes/LICENSE",
+      "bytes": 1077,
+      "sha256": "dbffd380d59504ba19fcf87ff5a1a33c37edf66d5b09966b0ad5368ab87bc2af"
+    },
+    {
+      "path": "reader/notices/npm/SOURCES.json",
+      "bytes": 3795,
+      "sha256": "2979367d0fc83f202cff1029c994cd7a8663657dccf3b061ffacc87eb98d0184"
+    },
+    {
+      "path": "reader/notices/npm/dom-serializer/LICENSE",
+      "bytes": 1075,
+      "sha256": "fd495b1bdd024995c6b3bd612584a4e37513250317bb5a6586f62c7756f9aff1"
+    },
+    {
+      "path": "reader/notices/npm/domelementtype/LICENSE",
+      "bytes": 1260,
+      "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164"
+    },
+    {
+      "path": "reader/notices/npm/domhandler/LICENSE",
+      "bytes": 1260,
+      "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164"
+    },
+    {
+      "path": "reader/notices/npm/domutils/LICENSE",
+      "bytes": 1260,
+      "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164"
+    },
+    {
+      "path": "reader/notices/npm/entities/LICENSE",
+      "bytes": 1260,
+      "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164"
+    },
+    {
+      "path": "reader/notices/npm/htmlparser2/LICENSE",
+      "bytes": 1104,
+      "sha256": "204cfa747341660e4da64cd23e8c876c6b20279d247f48564993d3fc4a2eab47"
+    },
+    {
+      "path": "reader/notices/npm/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "reader/package-lock.json",
+      "bytes": 4668,
+      "sha256": "fff2da9d1138eb6d6aab7718b797dee9e342366f69779ab9f7cd788421a35698"
+    },
+    {
+      "path": "reader/package.json",
+      "bytes": 207,
+      "sha256": "899d24c9719b7729ba26717318aa9329506d6ac1705293a9b05a5a53a0a10226"
+    },
+    {
+      "path": "samples/item-note.html",
+      "bytes": 127,
+      "sha256": "f5fef0c0609aeb07090147fe6fbe6b5ca163ac2ecc1cd2b8a57e1dc2c4bf32ae"
+    },
+    {
+      "path": "samples/item-qty.html",
+      "bytes": 123,
+      "sha256": "b88121f7d6d13bf4f3c34082ce5c5e48d35950f7c25a5a9e20929e65ffac640f"
+    },
+    {
+      "path": "src/build_dsl.py",
+      "bytes": 11914,
+      "sha256": "d30341ef84b126c881dba3990c11f5d79c6f0cd16d489b08b83be5e84bfdb6d9"
+    },
+    {
+      "path": "src/direct_client.py",
+      "bytes": 3264,
+      "sha256": "78c0370286fc9c2a168cc327b60da134c699a2a0ab7674db5af7dc3c4fa86ba0"
+    },
+    {
+      "path": "src/direct_csv.py",
+      "bytes": 4725,
+      "sha256": "8868ac70551d21b7c63cd18a430959ce6ddf91c2df0e7a31f72008cd0b8d07c9"
+    },
+    {
+      "path": "src/reader_boundary.mjs",
+      "bytes": 3602,
+      "sha256": "624404dcae9648711881712abb7eb1d0fc5385bef3212b886467bf66b9027c01"
+    },
+    {
+      "path": "src/table_csv.py",
+      "bytes": 15631,
+      "sha256": "230d2d67f2a6b0a3f8ef5b9c4725330c4eb496d27109c317e2b09eba12521da8"
+    },
+    {
+      "path": "tests/test_direct.py",
+      "bytes": 45034,
+      "sha256": "43743de6c85dd3bacc9d4e23925e7ef0de26553313c21a7a5d1ff37d20cbcaff"
+    },
+    {
+      "path": "tests/test_installed_network_probe.py",
+      "bytes": 2725,
+      "sha256": "002674214678ad57b1581d37a36e5f140ef1596f5a50d3fd7be7d604c56ee8f3"
+    },
+    {
+      "path": "tests/test_installer_safety.py",
+      "bytes": 5228,
+      "sha256": "93a8db77ebf4e7e286953ea0caee01933a0e8898d9aaa16c3c0114927a362e82"
+    },
+    {
+      "path": "tests/test_owned_runtime_cleanup.py",
+      "bytes": 9318,
+      "sha256": "2281179ecb5b834ef557128215e04d3c8e8ac913b9ac800537549e89d23b89e3"
+    },
+    {
+      "path": "workflow/reader-table-csv.dsl.yml",
+      "bytes": 46850,
+      "sha256": "a6b5eb97f4ed7f8a5534f295b41dc66f5c77f2001ade72dd631d55ccabfede3f"
+    }
+  ]
+}

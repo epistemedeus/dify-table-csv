@@ -1,0 +1,96 @@
+# Minimal pin for the disposable Dify 1.18 acceptance run.
+# Official docker/docker-compose.yaml at Dify 1.18.0 stays the engine definition.
+# This file only pins the images that run and turns off unused services.
+# Omitted: weaviate, web, nginx, agent_backend, local_sandbox,
+# agent_ssrf_proxy, worker_beat, api_websocket. The plugin daemon stays because
+# console export calls it. None of the omitted services execute this workflow.
+# Compressed image bytes are disk and network, not a RAM floor.
+services:
+  init_permissions:
+    image: busybox@sha256:f97baa533a26513c453a362be331a43eb60214302f449c16571b23cea141dce4
+  api:
+    image: langgenius/dify-api@sha256:0a7409b80eb9d587ff99d8ed3e791c915a82f75345c09fef7271860c0ddafc2e
+    ports:
+      - "127.0.0.1:5001:5001"
+    extra_hosts:
+      - "host.docker.internal:${DIFY_TABLE_DOCKER0}"
+    depends_on: !reset
+      init_permissions:
+        condition: service_completed_successfully
+      db_postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      MODE: api
+      MIGRATION_ENABLED: "true"
+      SERVER_WORKER_AMOUNT: "1"
+      SERVER_WORKER_CLASS: gevent
+      SERVER_WORKER_CONNECTIONS: "10"
+      SQLALCHEMY_POOL_SIZE: "5"
+      SQLALCHEMY_MAX_OVERFLOW: "2"
+      MARKETPLACE_ENABLED: "false"
+      MALLOC_ARENA_MAX: "2"
+  worker:
+    image: langgenius/dify-api@sha256:0a7409b80eb9d587ff99d8ed3e791c915a82f75345c09fef7271860c0ddafc2e
+    extra_hosts:
+      - "host.docker.internal:${DIFY_TABLE_DOCKER0}"
+    depends_on: !reset
+      init_permissions:
+        condition: service_completed_successfully
+      db_postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      api:
+        condition: service_healthy
+    environment:
+      MODE: worker
+      MIGRATION_ENABLED: "false"
+      CELERY_AUTO_SCALE: "false"
+      CELERY_WORKER_AMOUNT: "1"
+      CELERY_WORKER_CLASS: gevent
+      CELERY_WORKER_CONCURRENCY: "1"
+      SQLALCHEMY_POOL_SIZE: "5"
+      SQLALCHEMY_MAX_OVERFLOW: "2"
+      MARKETPLACE_ENABLED: "false"
+      MALLOC_ARENA_MAX: "2"
+  worker_beat:
+    profiles: ["omit"]
+  web:
+    profiles: ["omit"]
+  plugin_daemon:
+    image: langgenius/dify-plugin-daemon@sha256:0b8f1f1e766826352d868aaf8c9eeeee8e37a3a3b023044ed8ab0d145f853cdf
+    ports: !reset []
+  agent_backend:
+    profiles: ["omit"]
+  local_sandbox:
+    profiles: ["omit"]
+  agent_ssrf_proxy:
+    profiles: ["omit"]
+  nginx:
+    profiles: ["omit"]
+  api_websocket:
+    profiles: ["omit"]
+  db_postgres:
+    image: postgres@sha256:1d4031d6ed0a9b774b365f99a3c16127217eb19f699d8d43fc43b732748601ef
+  redis:
+    image: redis@sha256:d3eff30f5995e647ed7f22bf73987fb0999f19251c3845a436270c431b65a01a
+  sandbox:
+    image: langgenius/dify-sandbox@sha256:942acde5b90350498f71c9f89fe1c0a578578c51521d6683783e073528b6a26a
+    environment:
+      SANDBOX_WORKER_TIMEOUT: "30"
+  ssrf_proxy:
+    image: ubuntu/squid@sha256:8fafd41d6ddceb295d26eea9938321d825ac5351c7e46cf6a8aa5d093b8ed1ce
+    extra_hosts:
+      - "host.docker.internal:${DIFY_TABLE_DOCKER0}"
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: nat
+  ssrf_proxy_network:
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: nat
