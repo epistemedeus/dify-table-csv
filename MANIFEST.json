@@ -1,17 +1,17 @@
 {
   "schema": "dify-table-csv.archive-manifest.v1",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "members": [
     {
       "path": "COLD-INSTALL.txt",
-      "bytes": 5912,
-      "sha256": "45668101797b3945673e9d2aa71f4b3c82e61e134607de4de823a947008fe267"
+      "bytes": 6533,
+      "sha256": "e0b06cbe6ca1f858bebef86aec1c2b7d9544b88933b2a3141251326c8eda3f1f"
     },
     {
       "path": "COMPATIBILITY.json",
       "bytes": 1336,
-      "sha256": "f3ade7e368fe411e449857ed688d6be25044da9d8295d52031eb24dd92aa71d2"
+      "sha256": "53bc9cc1db86180a748444f42df0f057900096e4b60fc0743a5f2e1e35ef2133"
     },
     {
       "path": "LICENSE",
@@ -35,8 +35,8 @@
     },
     {
       "path": "install/cold-install.sh",
-      "bytes": 22236,
-      "sha256": "5a5ca001b13ec12af2d650a2601243d986b6d0ff04ac9603553dff28d2089a5c"
+      "bytes": 22436,
+      "sha256": "acf3781ea85cb467ffb213903371d02ac664697c7d42442d17fdca9f0f133550"
     },
     {
       "path": "install/compose.pin.yml",
@@ -57,6 +57,11 @@
       "path": "install/owned-runtime-probe.sh",
       "bytes": 18849,
       "sha256": "986d6896bbb2829154f43e7a84e248e3e832220eaa5927bc52044f31a5dafc58"
+    },
+    {
+      "path": "install/preflight.py",
+      "bytes": 13952,
+      "sha256": "a9da3f974256b711fffa8cd614b9299c1e5ca749f0680a1fcd02c10bdfa38566"
     },
     {
       "path": "install/probe-tcp.py",
@@ -220,8 +225,8 @@
     },
     {
       "path": "src/table_csv.py",
-      "bytes": 15631,
-      "sha256": "230d2d67f2a6b0a3f8ef5b9c4725330c4eb496d27109c317e2b09eba12521da8"
+      "bytes": 15507,
+      "sha256": "ae16c9620d57a46961889b95403003e396fb45cfa3811902c2a2b8b7e85f6677"
     },
     {
       "path": "tests/fixtures/ORIGINAL-INSTALLER-NOTICE.txt",
@@ -235,8 +240,8 @@
     },
     {
       "path": "tests/test_direct.py",
-      "bytes": 45034,
-      "sha256": "43743de6c85dd3bacc9d4e23925e7ef0de26553313c21a7a5d1ff37d20cbcaff"
+      "bytes": 46009,
+      "sha256": "1cc83f617b3f5c8e16545c8d4a6d2465730ce792516a74359698fd667c14f1db"
     },
     {
       "path": "tests/test_installed_network_probe.py",
@@ -259,9 +264,14 @@
       "sha256": "2281179ecb5b834ef557128215e04d3c8e8ac913b9ac800537549e89d23b89e3"
     },
     {
+      "path": "tests/test_preflight.py",
+      "bytes": 28657,
+      "sha256": "c1245966141706ce86c0c1675069c7acf8e904c423eadcc060a8a410ac56efb8"
+    },
+    {
       "path": "workflow/reader-table-csv.dsl.yml",
-      "bytes": 46850,
-      "sha256": "a6b5eb97f4ed7f8a5534f295b41dc66f5c77f2001ade72dd631d55ccabfede3f"
+      "bytes": 46582,
+      "sha256": "c7618a5f2dcc77060c94c0d03ead5dabf6fc3932a7beaa72a3a12ee4336aeb79"
     }
   ]
 }
