@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Disposable Dify 1.18.0 acceptance run for the packed table workflow.
+# Disposable Dify 1.19.0 acceptance run for the packed table workflow.
 # Without DIFY_TABLE_ADMIT=1 or H64314_ADMIT_DIFY=1 it does not docker pull
 # and does not start containers. A supplied Dify checkout is read only.
 # Normal CSV commands are src/direct_csv.py and install/use-existing.py.
@@ -8,7 +8,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-DIFY_COMMIT="50abea97062110044f15d0e03ccecadd9ccc87ca"
+DIFY_COMMIT="8e689e868b63b6dd2b449d0eb568ca5cc7127759"
 LICENSE_SHA="232cf91474932d5110ed304e53b6b742a58463857c571fae803fdf2ac36d7bb3"
 EXTRACT_SHA="e087cdcc6bbb019fa9ea0b8ca2e5f7d9e682dfb2bfd6b205e119330d32a5c6e1"
 LOCK_SHA="fff2da9d1138eb6d6aab7718b797dee9e342366f69779ab9f7cd788421a35698"
@@ -308,35 +308,61 @@ alphabet = string.ascii_letters + string.digits
 def token(n):
     return "Aa1" + "".join(secrets.choice(alphabet) for _ in range(n))
 
+def require_line(text, line):
+    if line not in text.splitlines():
+        raise SystemExit("missing env line: " + line)
+
+def set_value(text, key, value):
+    prefix = key + "="
+    found = False
+    out = []
+    for row in text.splitlines():
+        if row.startswith(prefix):
+            out.append(prefix + value)
+            found = True
+        else:
+            out.append(row)
+    if not found:
+        out.append(prefix + value)
+    return "\n".join(out) + "\n"
+
+# Dify 1.19.0 keeps deployment inputs in docker/.env.example and service
+# defaults under docker/envs. These two lines identify that template.
+require_line(text, "COMPOSE_PROFILES=weaviate,postgresql,collaboration")
+require_line(text, "DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN=")
+if not cidr.endswith("/32"):
+    raise SystemExit("missing env line: docker0 host route")
+docker0 = cidr[: -len("/32")]
 init_password = token(17)
 admin_password = token(17)
 secret = token(32)
-replacements = {
-    "INIT_PASSWORD=": "INIT_PASSWORD=" + init_password,
-    "SECRET_KEY=": "SECRET_KEY=" + secret,
-    "COMPOSE_PROFILES=${VECTOR_STORE:-weaviate},${DB_TYPE:-postgresql},collaboration": "COMPOSE_PROFILES=postgresql",
-    "CELERY_WORKER_AMOUNT=4": "CELERY_WORKER_AMOUNT=1",
-    "CELERY_AUTO_SCALE=false": "CELERY_AUTO_SCALE=false",
-    "SQLALCHEMY_POOL_SIZE=30": "SQLALCHEMY_POOL_SIZE=5",
-    "SQLALCHEMY_MAX_OVERFLOW=10": "SQLALCHEMY_MAX_OVERFLOW=2",
-    "POSTGRES_MAX_CONNECTIONS=200": "POSTGRES_MAX_CONNECTIONS=40",
-    "POSTGRES_SHARED_BUFFERS=128MB": "POSTGRES_SHARED_BUFFERS=64MB",
-    "POSTGRES_MAINTENANCE_WORK_MEM=64MB": "POSTGRES_MAINTENANCE_WORK_MEM=32MB",
-    "POSTGRES_EFFECTIVE_CACHE_SIZE=4096MB": "POSTGRES_EFFECTIVE_CACHE_SIZE=256MB",
-    "SSRF_DEFAULT_TIME_OUT=5": "SSRF_DEFAULT_TIME_OUT=30",
-    "SSRF_DEFAULT_CONNECT_TIME_OUT=5": "SSRF_DEFAULT_CONNECT_TIME_OUT=10",
-    "SSRF_DEFAULT_READ_TIME_OUT=5": "SSRF_DEFAULT_READ_TIME_OUT=30",
-    "SSRF_DEFAULT_WRITE_TIME_OUT=5": "SSRF_DEFAULT_WRITE_TIME_OUT=30",
-    "SANDBOX_WORKER_TIMEOUT=15": "SANDBOX_WORKER_TIMEOUT=30",
-    "MARKETPLACE_ENABLED=true": "MARKETPLACE_ENABLED=false",
-    "SSRF_PROXY_ALLOW_PRIVATE_IPS=": "SSRF_PROXY_ALLOW_PRIVATE_IPS=" + cidr,
+assignments = {
+    "COMPOSE_PROFILES": "postgresql",
+    "INIT_PASSWORD": init_password,
+    "SECRET_KEY": secret,
+    "DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN": token(32),
+    "CELERY_WORKER_AMOUNT": "1",
+    "CELERY_AUTO_SCALE": "false",
+    "SQLALCHEMY_POOL_SIZE": "5",
+    "SQLALCHEMY_MAX_OVERFLOW": "2",
+    "POSTGRES_MAX_CONNECTIONS": "40",
+    "POSTGRES_SHARED_BUFFERS": "64MB",
+    "POSTGRES_MAINTENANCE_WORK_MEM": "32MB",
+    "POSTGRES_EFFECTIVE_CACHE_SIZE": "256MB",
+    "SSRF_DEFAULT_TIME_OUT": "30",
+    "SSRF_DEFAULT_CONNECT_TIME_OUT": "10",
+    "SSRF_DEFAULT_READ_TIME_OUT": "30",
+    "SSRF_DEFAULT_WRITE_TIME_OUT": "30",
+    "SANDBOX_WORKER_TIMEOUT": "30",
+    "MARKETPLACE_ENABLED": "false",
+    "SSRF_PROXY_ALLOW_PRIVATE_IPS": cidr,
+    "SSRF_PROXY_ALLOW_PRIVATE_DOMAINS": "host.docker.internal",
+    # Compose reads --env-file for interpolation. sudo docker drops the shell
+    # export of DIFY_TABLE_DOCKER0, so the pin reads it from this file.
+    "DIFY_TABLE_DOCKER0": docker0,
 }
-for old, new in replacements.items():
-    if old not in text:
-        raise SystemExit("missing env line: " + old)
-    text = text.replace(old, new, 1)
-if "SSRF_PROXY_ALLOW_PRIVATE_DOMAINS=" not in text:
-    text += "\nSSRF_PROXY_ALLOW_PRIVATE_DOMAINS=host.docker.internal\n"
+for key, value in assignments.items():
+    text = set_value(text, key, value)
 admin = pathlib.Path(admin_path)
 admin.write_text(
     "email=dify-table-local@example.com\nname=Dify Table Local\npassword=%s\ninit_password=%s\n" % (admin_password, init_password)
@@ -425,7 +451,57 @@ export READER_BASE="http://${gateway}:8765"
 echo "reader_base=${READER_BASE}"
 echo "compose_config_services:"
 "${compose[@]}" config --services
-"${compose[@]}" config --format json | python3 "$ROOT/install/verify-compose-hosts.py" "$gateway"
+rendered="${state}/compose.rendered.json"
+"${compose[@]}" config --format json > "$rendered"
+python3 "$ROOT/install/verify-compose-hosts.py" "$gateway" < "$rendered"
+python3 - "$rendered" "$gateway" << 'PY'
+import json, sys
+path, gateway = sys.argv[1:]
+doc = json.load(open(path, encoding="utf-8"))
+
+def env_map(name):
+    service = doc["services"][name]
+    env = service.get("environment") or {}
+    if isinstance(env, list):
+        out = {}
+        for row in env:
+            if isinstance(row, str) and "=" in row:
+                key, value = row.split("=", 1)
+                out[key] = value
+        return out
+    if isinstance(env, dict):
+        return {str(key): "" if value is None else str(value) for key, value in env.items()}
+    return {}
+
+problems = []
+db = env_map("db_postgres")
+ssrf = env_map("ssrf_proxy")
+api = env_map("api")
+worker = env_map("worker")
+if db.get("POSTGRES_MAX_CONNECTIONS") != "40":
+    problems.append("db POSTGRES_MAX_CONNECTIONS is not 40")
+if db.get("POSTGRES_SHARED_BUFFERS") != "64MB":
+    problems.append("db shared buffers were not reduced")
+if ssrf.get("SSRF_PROXY_ALLOW_PRIVATE_IPS") != gateway + "/32":
+    problems.append("ssrf private allow is not the docker0 host")
+if ssrf.get("SSRF_PROXY_ALLOW_PRIVATE_DOMAINS") != "host.docker.internal":
+    problems.append("ssrf private domain allow is missing")
+if not api.get("INIT_PASSWORD"):
+    problems.append("api INIT_PASSWORD is empty")
+if not api.get("SECRET_KEY"):
+    problems.append("api SECRET_KEY is empty")
+if api.get("SECRET_KEY") != worker.get("SECRET_KEY"):
+    problems.append("api and worker SECRET_KEY differ")
+if api.get("MARKETPLACE_ENABLED") != "false":
+    problems.append("marketplace was not disabled")
+if problems:
+    print("not_installed")
+    for item in problems:
+        print("refuse: " + item)
+    raise SystemExit(2)
+print("compose_overrides=1")
+PY
+rm -f "$rendered"
 
 snapshot_owned() {
   "${DOCKER[@]}" ps -aq --no-trunc --filter "label=com.docker.compose.project=${PROJECT}" > "${state}/live.containers"

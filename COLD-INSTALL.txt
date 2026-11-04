@@ -1,4 +1,4 @@
-Public document table CSV 0.1.2
+Public document table CSV 0.1.3
 
 Verify the archive sha256 in the machine entry before you extract it.
 The archive runs without the neomorphic-io source tree.
@@ -11,7 +11,7 @@ provenance are on stderr. Exit 0 is ok. Exit 2 is usage. Exit 3 is
 unsupported. Exit 4 is malformed or another failed read. Exit 5 is transport.
 A stopped reader returns no CSV.
 
-  tar -xzf dify-table-csv-0.1.2.tar.gz
+  tar -xzf dify-table-csv-0.1.3.tar.gz
   cd dify-table-csv
   npm ci --ignore-scripts --prefix reader
   python3 src/direct_csv.py --url URL --fields Name,Value --start-reader
@@ -35,7 +35,7 @@ same command. A second sample with different columns returns different CSV.
           sys.exit(completed.returncode)
   PY
 
-Existing Dify 1.18 runtime
+Existing Dify 1.19 runtime
 
 Start the reader where that runtime can reach it. For Dify containers on the
 same host, bind a reachable address. The packed workflow calls
@@ -74,7 +74,7 @@ pull Dify.
   bash install/cold-install.sh
 
 H64314_ADMIT_DIFY=1 is still accepted. The script fetches public Dify commit
-50abea97062110044f15d0e03ccecadd9ccc87ca when DIFY_SOURCE and H64314_DIFY_SRC
+8e689e868b63b6dd2b449d0eb568ca5cc7127759 when DIFY_SOURCE and H64314_DIFY_SRC
 are unset, checks its LICENSE sha256, and starts api, worker, postgres,
 redis, sandbox, the SSRF proxy, the plugin daemon, and the permissions init.
 It does not start Weaviate, web, nginx, or the agent services. Weaviate
@@ -129,6 +129,9 @@ Stopped reader, malformed input, unsupported input, and recovery
   Recovery is another run after the reader process is listening. The workflow
   does not retry the HTTP node by itself.
 
-Console export on 1.18.0 defaults to an ifpkg zip. The acceptance tool
+Console export on 1.19.0 defaults to an app package. The acceptance tool
 requests format=yaml and include_secret=false, reimports that YAML, and runs
-POST /v1/workflows/run. total_tokens stays 0.
+POST /v1/workflows/run. total_tokens stays 0. The proof also reads the public
+item-note sample from this archive at commit
+a31b79541838c3d0023ee1af6150fae8a7e1cb8d. That URL is not one of the older
+fixture URLs.

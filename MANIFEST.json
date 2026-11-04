@@ -1,17 +1,22 @@
 {
   "schema": "dify-table-csv.archive-manifest.v1",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "members": [
     {
+      "path": "CHANGELOG.md",
+      "bytes": 825,
+      "sha256": "0ae487f07fa8936b47483bfd560fade5bc4f6aae5417641bdbfe8ddfd0cc33d4"
+    },
+    {
       "path": "COLD-INSTALL.txt",
-      "bytes": 6533,
-      "sha256": "e0b06cbe6ca1f858bebef86aec1c2b7d9544b88933b2a3141251326c8eda3f1f"
+      "bytes": 6701,
+      "sha256": "3a78fdd9d80e5070b3206ad63e2dc948e7e2478f909613066236aee3888250ad"
     },
     {
       "path": "COMPATIBILITY.json",
       "bytes": 1336,
-      "sha256": "53bc9cc1db86180a748444f42df0f057900096e4b60fc0743a5f2e1e35ef2133"
+      "sha256": "fb342ec75a15e2ea446c206dc7647b200f9a6ee1900fc5fdbc0565fe95fa309b"
     },
     {
       "path": "LICENSE",
@@ -20,28 +25,28 @@
     },
     {
       "path": "LICENSES.md",
-      "bytes": 1666,
-      "sha256": "32ef7b9d6cdd95f628691882805cc92ecf27c96941350b8b4ca0ede6c3755baa"
+      "bytes": 1707,
+      "sha256": "707c649e8f49dda2b0bec66108e6f55c843606094036135328e1b50b1d1177a5"
     },
     {
       "path": "README.md",
       "bytes": 1448,
-      "sha256": "4bd72ecd76688c2eeb7e9d4d34acc2641f5da4c8fae8dd8016963d91d82cca90"
+      "sha256": "af481421e81f3ba9e8dd0ec19bdfe62907ef0a9166109d72675aa7dd9b4e0f00"
     },
     {
       "path": "SOURCE-NOTICE.txt",
       "bytes": 1489,
-      "sha256": "ae01c304764f870cb7c5226c62cfeb68b3dc56c23427f90a78c37af22dcaf5d2"
+      "sha256": "491a467ac01fc5291326ffbdf3117cd81944d16fdeeb1e50431d826d79e3f939"
     },
     {
       "path": "install/cold-install.sh",
-      "bytes": 22436,
-      "sha256": "acf3781ea85cb467ffb213903371d02ac664697c7d42442d17fdca9f0f133550"
+      "bytes": 24659,
+      "sha256": "fc3eba83e43826c562f4829863604fc816aa762a681e10ba00d9dca3e3ac1d44"
     },
     {
       "path": "install/compose.pin.yml",
-      "bytes": 3316,
-      "sha256": "ead1d456b0679d6389aeef31958f99c9db1c633b90ab8bb13ba8cc035f7f65b9"
+      "bytes": 4376,
+      "sha256": "1e76f7825c2f42f3bda5e0d1945d35be7be93c48664a04fbf1148dc05fcec60f"
     },
     {
       "path": "install/export-tracked-docker.sh",
@@ -50,8 +55,8 @@
     },
     {
       "path": "install/installed-proof.py",
-      "bytes": 22988,
-      "sha256": "3329164d64bb29f6ccd9f726eeffee3de29e28c97c85b469c4b3dc1908cb8248"
+      "bytes": 23865,
+      "sha256": "fafdb512a11c06fd5cf1a5166e6ecc8a176dca403389601840d2050d5a2f4411"
     },
     {
       "path": "install/owned-runtime-probe.sh",
@@ -89,9 +94,14 @@
       "sha256": "a2a91aedae38219cec3c821a058772159a61e0640682072ff59a2bffdc25c12b"
     },
     {
-      "path": "licenses/dify-1.18.0-LICENSE",
+      "path": "licenses/dify-1.19.0-LICENSE",
       "bytes": 1801,
       "sha256": "232cf91474932d5110ed304e53b6b742a58463857c571fae803fdf2ac36d7bb3"
+    },
+    {
+      "path": "proof/dify-1.19.0-run.json",
+      "bytes": 6845,
+      "sha256": "b52c7cd3f9671a742e185dad4f8311a0bbda15b8cd3daf4b4296085fbebd6fd0"
     },
     {
       "path": "reader/LICENSE",
@@ -240,8 +250,8 @@
     },
     {
       "path": "tests/test_direct.py",
-      "bytes": 46009,
-      "sha256": "1cc83f617b3f5c8e16545c8d4a6d2465730ce792516a74359698fd667c14f1db"
+      "bytes": 45984,
+      "sha256": "02d43573b888ceea0fbe2e39c392b3743c792cfba2df9a5074dc23f4f477ea34"
     },
     {
       "path": "tests/test_installed_network_probe.py",

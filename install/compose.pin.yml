@@ -1,15 +1,19 @@
-# Minimal pin for the disposable Dify 1.18 acceptance run.
-# Official docker/docker-compose.yaml at Dify 1.18.0 stays the engine definition.
-# This file only pins the images that run and turns off unused services.
+# Minimal pin for the disposable Dify 1.19.0 acceptance run.
+# Official docker/docker-compose.yaml at Dify 1.19.0 stays the engine definition.
+# This file pins the images resolved from that compose file and turns off unused services.
+# Digests are the linux/amd64 manifests pulled for tags busybox:latest,
+# langgenius/dify-api:1.19.0, langgenius/dify-plugin-daemon:0.6.14-local,
+# postgres:15-alpine, redis:6-alpine, langgenius/dify-sandbox:0.2.15,
+# and ubuntu/squid:latest.
 # Omitted: weaviate, web, nginx, agent_backend, local_sandbox,
 # agent_ssrf_proxy, worker_beat, api_websocket. The plugin daemon stays because
 # console export calls it. None of the omitted services execute this workflow.
 # Compressed image bytes are disk and network, not a RAM floor.
 services:
   init_permissions:
-    image: busybox@sha256:f97baa533a26513c453a362be331a43eb60214302f449c16571b23cea141dce4
+    image: busybox@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
   api:
-    image: langgenius/dify-api@sha256:0a7409b80eb9d587ff99d8ed3e791c915a82f75345c09fef7271860c0ddafc2e
+    image: langgenius/dify-api@sha256:0d67842aedcb9b5884f75b88c4a5dd812e637916bff1ca892831f7ace2f3204f
     ports:
       - "127.0.0.1:5001:5001"
     extra_hosts:
@@ -31,8 +35,14 @@ services:
       SQLALCHEMY_MAX_OVERFLOW: "2"
       MARKETPLACE_ENABLED: "false"
       MALLOC_ARENA_MAX: "2"
+      INIT_PASSWORD: ${INIT_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      SSRF_DEFAULT_TIME_OUT: "30"
+      SSRF_DEFAULT_CONNECT_TIME_OUT: "10"
+      SSRF_DEFAULT_READ_TIME_OUT: "30"
+      SSRF_DEFAULT_WRITE_TIME_OUT: "30"
   worker:
-    image: langgenius/dify-api@sha256:0a7409b80eb9d587ff99d8ed3e791c915a82f75345c09fef7271860c0ddafc2e
+    image: langgenius/dify-api@sha256:0d67842aedcb9b5884f75b88c4a5dd812e637916bff1ca892831f7ace2f3204f
     extra_hosts:
       - "host.docker.internal:${DIFY_TABLE_DOCKER0}"
     depends_on: !reset
@@ -55,12 +65,18 @@ services:
       SQLALCHEMY_MAX_OVERFLOW: "2"
       MARKETPLACE_ENABLED: "false"
       MALLOC_ARENA_MAX: "2"
+      INIT_PASSWORD: ${INIT_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      SSRF_DEFAULT_TIME_OUT: "30"
+      SSRF_DEFAULT_CONNECT_TIME_OUT: "10"
+      SSRF_DEFAULT_READ_TIME_OUT: "30"
+      SSRF_DEFAULT_WRITE_TIME_OUT: "30"
   worker_beat:
     profiles: ["omit"]
   web:
     profiles: ["omit"]
   plugin_daemon:
-    image: langgenius/dify-plugin-daemon@sha256:0b8f1f1e766826352d868aaf8c9eeeee8e37a3a3b023044ed8ab0d145f853cdf
+    image: langgenius/dify-plugin-daemon@sha256:17ee86306a35c2c7e5910016f72e441c0252f0416bb9a845862088e9f8efa873
     ports: !reset []
   agent_backend:
     profiles: ["omit"]
@@ -73,15 +89,24 @@ services:
   api_websocket:
     profiles: ["omit"]
   db_postgres:
-    image: postgres@sha256:1d4031d6ed0a9b774b365f99a3c16127217eb19f699d8d43fc43b732748601ef
+    image: postgres@sha256:54e0dd8e8cddcdbb9156c2486eed5a43eccb7214d7c6828097d41ce049fb3984
+    environment:
+      POSTGRES_MAX_CONNECTIONS: "40"
+      POSTGRES_SHARED_BUFFERS: "64MB"
+      POSTGRES_MAINTENANCE_WORK_MEM: "32MB"
+      POSTGRES_EFFECTIVE_CACHE_SIZE: "256MB"
   redis:
-    image: redis@sha256:d3eff30f5995e647ed7f22bf73987fb0999f19251c3845a436270c431b65a01a
+    image: redis@sha256:63d5174750e285bc3069c4519c53c8b6de6ebe70715140a6c9d21d6f04b77319
   sandbox:
-    image: langgenius/dify-sandbox@sha256:942acde5b90350498f71c9f89fe1c0a578578c51521d6683783e073528b6a26a
+    image: langgenius/dify-sandbox@sha256:750e1111426ef31a9217b81c98cccfb750f17b182af3221102e420afa9f0928e
     environment:
       SANDBOX_WORKER_TIMEOUT: "30"
+      WORKER_TIMEOUT: "30"
   ssrf_proxy:
-    image: ubuntu/squid@sha256:8fafd41d6ddceb295d26eea9938321d825ac5351c7e46cf6a8aa5d093b8ed1ce
+    image: ubuntu/squid@sha256:6a097f68bae708cedbabd6188d68c7e2e7a38cedd05a176e1cc0ba29e3bbe029
+    environment:
+      SSRF_PROXY_ALLOW_PRIVATE_IPS: ${DIFY_TABLE_DOCKER0}/32
+      SSRF_PROXY_ALLOW_PRIVATE_DOMAINS: host.docker.internal
     extra_hosts:
       - "host.docker.internal:${DIFY_TABLE_DOCKER0}"
 networks:
