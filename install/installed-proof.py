@@ -36,6 +36,11 @@ SPAN_URL = (
     + "/integrations/olas-reader/fixtures/olas-reader-runtime.html"
 )
 FIELDS = ["Engine", "Transpile", "Reconcile"]
+NOTE_URL = (
+    "https://raw.githubusercontent.com/epistemedeus/dify-table-csv/"
+    "a31b79541838c3d0023ee1af6150fae8a7e1cb8d/samples/item-note.html"
+)
+NOTE_FIELDS = ["Item", "Note"]
 FORBIDDEN = {"llm", "agent", "knowledge-retrieval", "knowledge-index", "question-classifier", "parameter-extractor", "tool"}
 ALLOWED = {"start", "if-else", "http-request", "code", "end"}
 
@@ -236,7 +241,7 @@ def main():
     console.token = token
 
     first = console.import_yaml(DSL.read_text())
-    # Dify 1.18 defaults this route to an ifpkg zip. format=yaml is the supported DSL export.
+    # The console default export is an app package. format=yaml is the DSL export.
     export_code, exported = console.request(
         "GET", "/console/api/apps/%s/export?include_secret=false&format=yaml" % first["app_id"]
     )
@@ -342,6 +347,20 @@ def main():
     first_row["billing_zero"] = billing_ok(outputs_of(ready[1])[0])
     runs.append(first_row)
 
+    direct_note = run_job(reader_base, NOTE_URL, NOTE_FIELDS, 40000, 1)
+    runs.append(
+        once(
+            "item_note_public",
+            {
+                "document_url": NOTE_URL,
+                "fields_json": json.dumps(NOTE_FIELDS),
+                "markdown_limit": 40000,
+                "page": 1,
+            },
+            direct_note,
+        )
+    )
+
     direct_page2 = run_job(reader_base, FIXTURE_URL, FIELDS, 40000, 2)
     runs.append(once("page2_gate", {**page1, "page": 2}, direct_page2))
     direct_span = run_job(reader_base, SPAN_URL, ["Engine", "Reconcile"], 40000, 1)
@@ -435,6 +454,16 @@ def main():
             "handoff_equal": True,
             "billing_zero": True,
             "workflow_status": "succeeded",
+            "reader_request_delta": 1,
+        },
+        "item_note_public": {
+            "status_equal": True,
+            "csv_equal": True,
+            "provenance_equal": True,
+            "handoff_equal": True,
+            "billing_zero": True,
+            "workflow_status": "succeeded",
+            "output_status": "ok",
             "reader_request_delta": 1,
         },
         "page2_gate": {"status_equal": True, "csv_equal": True, "provenance_equal": True, "handoff_equal": True, "reader_request_delta": 0, "billing_zero": True},

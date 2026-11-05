@@ -1,0 +1,55 @@
+{
+  "schema": "dify-table-csv.consumer-bytes.v1",
+  "package_version": "0.1.3",
+  "base_commit": "a31b79541838c3d0023ee1af6150fae8a7e1cb8d",
+  "consumer": {
+    "repository": "epistemedeus/samedaydesk",
+    "commit": "57fa8d4b",
+    "pins": "experiments/n4-workflow-distribution-20261104/PINS.json",
+    "vendored_commit": "a31b79541838c3d0023ee1af6150fae8a7e1cb8d",
+    "vendored_version": "0.1.2",
+    "checker": "h64314.table_csv.v1"
+  },
+  "checker_id": "h64314.table_csv.v1",
+  "provenance_schema": "h64314.reader-csv.provenance.v1",
+  "checker_id_unchanged": true,
+  "provenance_schema_unchanged": true,
+  "consumer_change_required": false,
+  "reason": "The consumer needs no change unless the checker or DSL bytes changed. Those bytes are identical.",
+  "files": [
+    {
+      "consumer_path": "assets/dify/table_csv.py",
+      "package_path": "src/table_csv.py",
+      "bytes": 15507,
+      "a31b7954_sha256": "ae16c9620d57a46961889b95403003e396fb45cfa3811902c2a2b8b7e85f6677",
+      "head_sha256": "ae16c9620d57a46961889b95403003e396fb45cfa3811902c2a2b8b7e85f6677",
+      "relation": "identical"
+    },
+    {
+      "consumer_path": "assets/dify/reader-table-csv.dsl.yml",
+      "package_path": "workflow/reader-table-csv.dsl.yml",
+      "bytes": 46582,
+      "a31b7954_sha256": "c7618a5f2dcc77060c94c0d03ead5dabf6fc3932a7beaa72a3a12ee4336aeb79",
+      "head_sha256": "c7618a5f2dcc77060c94c0d03ead5dabf6fc3932a7beaa72a3a12ee4336aeb79",
+      "relation": "identical"
+    },
+    {
+      "consumer_path": "assets/dify/LICENSE",
+      "package_path": "LICENSE",
+      "bytes": 1112,
+      "a31b7954_sha256": "238cf73a0312a806fd20a920f17422f666873f9d24e7af500211bb6658f8ef49",
+      "head_sha256": "238cf73a0312a806fd20a920f17422f666873f9d24e7af500211bb6658f8ef49",
+      "relation": "identical"
+    },
+    {
+      "consumer_path": "assets/dify/SOURCE-NOTICE.txt",
+      "package_path": "SOURCE-NOTICE.txt",
+      "a31b7954_bytes": 1489,
+      "head_bytes": 1489,
+      "a31b7954_sha256": "ae01c304764f870cb7c5226c62cfeb68b3dc56c23427f90a78c37af22dcaf5d2",
+      "head_sha256": "491a467ac01fc5291326ffbdf3117cd81944d16fdeeb1e50431d826d79e3f939",
+      "relation": "changed",
+      "a31b7954_opening": "dify-table-csv 0.1.0"
+    }
+  ]
+}

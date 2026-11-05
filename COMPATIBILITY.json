@@ -1,9 +1,9 @@
 {
   "schema": "dify-table-csv.compatibility.v1",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "dify": {
-    "commit": "50abea97062110044f15d0e03ccecadd9ccc87ca",
-    "release": "1.18.0",
+    "commit": "8e689e868b63b6dd2b449d0eb568ca5cc7127759",
+    "release": "1.19.0",
     "dsl_version": "0.7.0",
     "license_sha256": "232cf91474932d5110ed304e53b6b742a58463857c571fae803fdf2ac36d7bb3",
     "export": "GET /console/api/apps/<uuid>/export?include_secret=false&format=yaml",

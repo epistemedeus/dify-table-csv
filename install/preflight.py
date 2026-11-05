@@ -3,7 +3,8 @@
 
 This runs after the installer has selected one docker CLI and before any
 upstream fetch or image pull. It does not choose a different engine, require
-a historical socket, or change host firewall rules.
+a historical socket, or change host firewall rules. When iptables-legacy is
+installed, it lists the filter FORWARD policy. A DROP policy stops the run.
 """
 
 from __future__ import annotations
@@ -80,6 +81,62 @@ def same_id(left, right):
         return value
     left_norm = norm(left)
     return left_norm == norm(right) and re.fullmatch(r"[0-9a-f]{64}", left_norm) is not None
+
+
+def forward_policy_is_drop(text):
+    """True only for a FORWARD chain policy of DROP, not for a later DROP rule."""
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        if parts[:3] == ["-P", "FORWARD", "DROP"]:
+            return True
+        if line.startswith("Chain FORWARD ") and "(policy DROP)" in line:
+            return True
+    return False
+
+
+def _listing_ok(status, completed):
+    return status == "ok" and completed is not None and completed.returncode == 0
+
+
+def read_forward_policy(run, which=None):
+    """List the filter FORWARD policy. Never passes a policy-changing flag."""
+    finder = which or shutil.which
+    binary = finder("iptables-legacy")
+    if not binary:
+        return None
+
+    def invoke(argv):
+        try:
+            return run(argv)
+        except FileNotFoundError:
+            return "missing", None
+
+    status, completed = invoke([binary, "-S", "FORWARD"])
+    if _listing_ok(status, completed):
+        return decode_text(completed.stdout)
+    if status in ("timeout", "missing"):
+        return None
+    status, completed = invoke(["sudo", "-n", binary, "-S", "FORWARD"])
+    if _listing_ok(status, completed):
+        return decode_text(completed.stdout)
+    return None
+
+
+def check_forward_policy(run, which=None):
+    text = read_forward_policy(run, which)
+    if text is None:
+        print("forward_policy=unread")
+        return
+    if forward_policy_is_drop(text):
+        print("forward_policy=drop")
+        refuse(
+            "iptables-legacy FORWARD policy is DROP, so containers on a user-defined bridge cannot reach each other",
+            "Set the host filter FORWARD policy to ACCEPT and re-run. This installer does not change firewall policy.",
+        )
+    print("forward_policy=accept")
 
 
 def check_venv(state):
@@ -331,6 +388,7 @@ def main(argv):
             "selected docker command is empty",
             "re-run install/cold-install.sh after docker info succeeds",
         )
+    check_forward_policy(run_bounded)
     check_venv(state)
     check_compose(docker)
     check_mount(state, docker)
