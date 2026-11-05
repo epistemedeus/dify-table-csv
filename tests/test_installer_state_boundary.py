@@ -9,6 +9,7 @@ is expected to accept an in-source state directory.
 """
 from __future__ import annotations
 
+import atexit
 import hashlib
 import os
 import re
@@ -20,6 +21,11 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# Prefix siblings are planted under a temp root this process owns. The
+# checkout parent is not writable on every host. The paths stay in ADJACENT,
+# so the preservation checks still refuse to delete them.
+SIBLING_ROOT = Path(tempfile.mkdtemp(prefix="h10200-sibling-root-"))
+atexit.register(lambda: shutil.rmtree(SIBLING_ROOT, ignore_errors=True))
 
 
 def neomorphic_checkout(package_root):
@@ -65,13 +71,19 @@ CLEARED = (
 )
 FAKES = ("docker", "sudo", "git", "npm", "ip", "curl", "wget", "ssh")
 SECRET_NAMES = ("local-admin.txt", "owner.json", "owner.token", "runtime.env", ".env")
+
+
+def sibling_path(suffix):
+    return SIBLING_ROOT / (ROOT.name + suffix)
+
+
 ADJACENT = (
     ROOT / "local-state",
     ROOT / "install" / "nested-state",
     ROOT / "inside-link",
-    ROOT.parent / (ROOT.name + "-h10200-sibling"),
-    ROOT.parent / (ROOT.name + "-h10200-rel"),
-    ROOT.parent / (ROOT.name + "-h10200-via-link"),
+    sibling_path("-h10200-sibling"),
+    sibling_path("-h10200-rel"),
+    sibling_path("-h10200-via-link"),
 )
 
 
@@ -609,14 +621,10 @@ class InstallerStateBoundaryTests(unittest.TestCase):
 
     def test_cleanup_preserves_preexisting_source_adjacent_state(self):
         planted = []
-        specs = (
-            (ROOT / "local-state", "dir"),
-            (ROOT / "install" / "nested-state", "dir"),
-            (ROOT / "inside-link", "link"),
-            (ROOT.parent / (ROOT.name + "-h10200-sibling"), "dir"),
-            (ROOT.parent / (ROOT.name + "-h10200-rel"), "dir"),
-            (ROOT.parent / (ROOT.name + "-h10200-via-link"), "dir"),
-        )
+        specs = tuple((path, "link" if path.name == "inside-link" else "dir") for path in ADJACENT)
+        self.assertEqual(SIBLING_ROOT, sibling_path("-h10200-sibling").parent)
+        self.assertNotEqual(sibling_path("-h10200-sibling").parent, Path("/"))
+        self.assertTrue(os.access(SIBLING_ROOT, os.W_OK))
         for path, kind in specs:
             if path.exists() or path.is_symlink():
                 continue

@@ -95,6 +95,14 @@ this machine's files stops the script before the upstream fetch and before
 any image pull. The script does not switch engines and does not change host
 firewall rules.
 
+The same preflight lists the iptables-legacy filter FORWARD policy before
+any image pull. The list is read only. When that policy is DROP, the script
+stops. Containers on a user-defined bridge cannot reach each other while it
+is DROP, and the API health check would then wait until it fails. Set the
+host filter FORWARD policy to ACCEPT and re-run. This installer does not
+change firewall policy. When the list command is missing or not permitted,
+preflight prints forward_policy=unread and continues.
+
 Set DIFY_TABLE_STATE only to a path that does not exist yet. An existing
 directory or symlink is refused before any permission change, write, or
 Docker command. The script creates that directory itself and records the

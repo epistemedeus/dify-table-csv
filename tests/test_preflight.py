@@ -651,5 +651,135 @@ os.execv(real, [real, *sys.argv[1:]])
         self.assertEqual(set(ids("images")), before_images)
 
 
+class _Completed:
+    def __init__(self, code, out):
+        self.returncode = code
+        self.stdout = out
+        self.stderr = b""
+
+
+def load_forward_preflight():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "dify_table_preflight_forward",
+        ROOT / "install" / "preflight.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class ForwardPolicyTests(unittest.TestCase):
+    def assert_list_only(self, argv):
+        banned = {"-P", "-A", "-I", "-D", "-F", "-X", "-Z", "--policy"}
+        self.assertTrue(banned.isdisjoint(argv), argv)
+        self.assertIn("-S", argv)
+        self.assertIn("FORWARD", argv)
+
+    def test_drop_listing_fails_fast_without_mutation(self):
+        import contextlib
+        import io
+        preflight = load_forward_preflight()
+        calls = []
+
+        def run(argv):
+            calls.append(list(argv))
+            self.assert_list_only(argv)
+            return "ok", _Completed(0, b"-P FORWARD DROP\n-A FORWARD -j DOCKER-USER\n")
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            with self.assertRaises(SystemExit) as caught:
+                preflight.check_forward_policy(
+                    run,
+                    which=lambda name: "/usr/sbin/iptables-legacy" if name == "iptables-legacy" else None,
+                )
+        self.assertEqual(caught.exception.code, 2)
+        text = output.getvalue()
+        self.assertIn("forward_policy=drop", text)
+        self.assertIn(
+            "refuse: iptables-legacy FORWARD policy is DROP, so containers on a user-defined bridge cannot reach each other",
+            text,
+        )
+        self.assertIn("Set the host filter FORWARD policy to ACCEPT and re-run. This installer does not change firewall policy.", text)
+        self.assertEqual(calls, [["/usr/sbin/iptables-legacy", "-S", "FORWARD"]])
+
+    def test_accept_listing_ignores_a_later_drop_rule(self):
+        import contextlib
+        import io
+        preflight = load_forward_preflight()
+        calls = []
+
+        def run(argv):
+            calls.append(list(argv))
+            self.assert_list_only(argv)
+            return "ok", _Completed(0, b"-P FORWARD ACCEPT\n-A FORWARD -j DROP\n")
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            preflight.check_forward_policy(
+                run,
+                which=lambda name: "/usr/sbin/iptables-legacy" if name == "iptables-legacy" else None,
+            )
+        self.assertIn("forward_policy=accept", output.getvalue())
+        self.assertNotIn("refuse:", output.getvalue())
+        self.assertEqual(calls, [["/usr/sbin/iptables-legacy", "-S", "FORWARD"]])
+
+    def test_chain_header_drop_is_detected(self):
+        preflight = load_forward_preflight()
+        self.assertTrue(preflight.forward_policy_is_drop("Chain FORWARD (policy DROP)\n"))
+        self.assertFalse(preflight.forward_policy_is_drop("Chain FORWARD (policy ACCEPT)\n"))
+
+    def test_missing_command_is_unread_and_does_not_run(self):
+        import contextlib
+        import io
+        preflight = load_forward_preflight()
+
+        def run(argv):
+            raise AssertionError(argv)
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            preflight.check_forward_policy(run, which=lambda name: None)
+        self.assertEqual(output.getvalue().strip(), "forward_policy=unread")
+
+    def test_permission_denied_uses_one_sudo_list(self):
+        import contextlib
+        import io
+        preflight = load_forward_preflight()
+        calls = []
+
+        def run(argv):
+            calls.append(list(argv))
+            self.assert_list_only(argv)
+            if argv[0] == "sudo":
+                return "ok", _Completed(0, b"-P FORWARD DROP\n")
+            return "ok", _Completed(4, b"")
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            with self.assertRaises(SystemExit) as caught:
+                preflight.check_forward_policy(
+                    run,
+                    which=lambda name: "/usr/sbin/iptables-legacy" if name == "iptables-legacy" else None,
+                )
+        self.assertEqual(caught.exception.code, 2)
+        self.assertEqual(
+            calls,
+            [
+                ["/usr/sbin/iptables-legacy", "-S", "FORWARD"],
+                ["sudo", "-n", "/usr/sbin/iptables-legacy", "-S", "FORWARD"],
+            ],
+        )
+        self.assertIn("forward_policy=drop", output.getvalue())
+
+    def test_sources_do_not_set_firewall_policy(self):
+        preflight_text = (ROOT / "install" / "preflight.py").read_text(encoding="utf-8")
+        installer = (ROOT / "install" / "cold-install.sh").read_text(encoding="utf-8")
+        self.assertNotIn("iptables-legacy -P", preflight_text)
+        self.assertNotIn("-P FORWARD ACCEPT", preflight_text)
+        self.assertNotIn("iptables", installer)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,82 @@
+{
+  "schema": "dify-table-csv.forward-preflight.v1",
+  "package_version": "0.1.3",
+  "installer_changes_firewall_policy": false,
+  "drop": {
+    "command": "DIFY_TABLE_ADMIT=1 DIFY_TABLE_STATE=/tmp/n4-r2-forward-drop-state bash install/cold-install.sh",
+    "policy_before_run": "-P FORWARD DROP",
+    "policy_after_run": "-P FORWARD DROP",
+    "exit_code": 2,
+    "elapsed_sec": 0,
+    "forward_policy": "drop",
+    "preflight_ok": false,
+    "docker_pull_begin": false,
+    "api_health": "not_reached",
+    "message": "iptables-legacy FORWARD policy is DROP, so containers on a user-defined bridge cannot reach each other. Set the host filter FORWARD policy to ACCEPT and re-run. This installer does not change firewall policy."
+  },
+  "accept": {
+    "command": "DIFY_TABLE_ADMIT=1 DIFY_TABLE_STATE=/tmp/n4-r2-forward-pass-state bash install/cold-install.sh",
+    "started": "2026-11-05T00:04:57Z",
+    "policy": "-P FORWARD ACCEPT",
+    "exit_code": 0,
+    "elapsed_sec": 97,
+    "forward_policy": "accept",
+    "preflight_ok": 1,
+    "api_health": "ok",
+    "api_version": "1.19.0",
+    "reader_reachability": 1,
+    "installed_http": "passed",
+    "proof_exit": 0,
+    "runs": [
+      {
+        "name": "page1_fixture_ready",
+        "csv_sha256": "a21e38a7db1d0c5273ab356d9d85805c2fe453af6e6ef7b7eb894f3cc4700792",
+        "csv_bytes": 47,
+        "output_status": "ok",
+        "total_tokens": 0
+      },
+      {
+        "name": "item_note_public",
+        "csv_sha256": "e370e1c54f576576ff72c75457d436b12c8dca074e23a94e53af55df1a8a2d86",
+        "csv_bytes": 20,
+        "output_status": "ok",
+        "total_tokens": 0
+      },
+      {
+        "name": "page2_gate",
+        "csv_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "csv_bytes": 0,
+        "output_status": "unsupported",
+        "total_tokens": 0
+      },
+      {
+        "name": "combined_spans",
+        "csv_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "csv_bytes": 0,
+        "output_status": "unsupported",
+        "total_tokens": 0
+      },
+      {
+        "name": "dns_transport",
+        "csv_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "csv_bytes": 0,
+        "output_status": "transport",
+        "total_tokens": 0
+      },
+      {
+        "name": "reader_down",
+        "csv_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "csv_bytes": 0,
+        "output_status": "malformed",
+        "total_tokens": 0
+      },
+      {
+        "name": "reader_recovered",
+        "csv_sha256": "a21e38a7db1d0c5273ab356d9d85805c2fe453af6e6ef7b7eb894f3cc4700792",
+        "csv_bytes": 47,
+        "output_status": "ok",
+        "total_tokens": 0
+      }
+    ]
+  }
+}
